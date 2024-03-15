@@ -39,13 +39,13 @@ int main()
         {
             for (j = 0; j < n; j++)
             {
-                *(*(mas + i) + j) = rand() % 6 - 3;
+                *(*(mas + i) + j) = rand() % 1000 - 500;
             }
         }
         printf("\n");
         printmatrix(m, n, mas);
 
-        gauss(m,n, mas);
+        gauss(m, n, mas);
 
         printmatrix(m, n, mas);
 
@@ -326,7 +326,7 @@ void gauss(int m, int n, float **mas)
 
     float *temp;
     float temp2;
-    int i,j;
+    int i, j;
 
     for (i = 0; i < m - 1; i++) // поднимает строку, первый элемент которой равен единице, на первую позицию, а нулю - на одну вниз
     {
@@ -391,6 +391,9 @@ void gauss(int m, int n, float **mas)
                 else if (c == -1)
                 {
                     *(*(mas + i) + j) += a;
+                }
+                else  {
+                    *(*(mas + i) + j) += -1 * a * c;
                 }
             }
         }
