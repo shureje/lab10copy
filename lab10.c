@@ -318,6 +318,9 @@ void seccondhalf(int m, int n, float **mas)
             count += 1;
             printf("Сумма %d-ого четного столбца с индексом(%d)(считая от середины матрицы) во второй половине: %lf\n", count, j - half, summ);
         }
+        else {
+            break;
+        }
     }
 }
 
