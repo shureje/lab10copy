@@ -9,7 +9,7 @@ void randmatrix(int, int, float **);
 void avgstr(int, int, float **, float);
 void firsthalf(int, int, float **);
 void seccondhalf(int, int, float **);
-void gauss(int, int, float **);
+void gauss(int, int, int, float **);
 
 int main()
 {
@@ -28,26 +28,22 @@ int main()
         scanf("%d", &N);
         m = N;
         n = N + 1;
+        printf("Будет задана матрица %d-ого порядка.\n Введите коэффициенты уравнений(заполняется сверху-вниз, слева-направо)\n", N);
+
         float **mas = (float **)malloc(m * sizeof(float *));
         for (i = 0; i < m; i++)
         {
             *(mas + i) = (float *)malloc(n * sizeof(float));
-        }
-        printf("Будет задана матрица %d-ого порядка.\n Введите коэффициенты уравнений(заполняется сверху-вниз, слева-направо)\n", N);
-
-        for (i = 0; i < m; i++)
-        {
             for (j = 0; j < n; j++)
             {
-                *(*(mas + i) + j) = rand() % 1000 - 500;
+                scanf("%f", (*(mas + i) + j));
             }
         }
+
         printf("\n");
         printmatrix(m, n, mas);
 
-        gauss(m, n, mas);
-
-        printmatrix(m, n, mas);
+        gauss(m, n, N, mas);
 
         free(mas);
     }
@@ -113,7 +109,7 @@ int main()
         {
             for (j = 0; j < n; j++)
             {
-                *(*(mas + i) + j) = rand() % 1000 - 500;
+                *(*(mas + i) + j) = rand() % 50 - 25;
             }
         }
 
@@ -231,11 +227,11 @@ void printmatrix(int m, int n, float **mas)
         {
             if (j < (n - 1))
             {
-                printf("%.2lf ", *(*(mas + i) + j));
+                printf("%.1lf ", *(*(mas + i) + j));
             }
             else
             {
-                printf("%.2lf \n", *(*(mas + i) + j));
+                printf("%.1lf \n", *(*(mas + i) + j));
             }
         }
     }
@@ -303,14 +299,15 @@ void firsthalf(int m, int n, float **mas)
 
 void seccondhalf(int m, int n, float **mas)
 {
-    int i, j, half;
+    int i, j;
+    int half = n / 2;
     int count = 0;
     float summ;
     for (j = half; j < n; j++)
     {
-        summ = 0;
         if (j % 2 == 0)
         {
+            summ = 0;
             for (i = 0; i < m; i++)
             {
                 summ += *(*(mas + i) + j);
@@ -318,18 +315,18 @@ void seccondhalf(int m, int n, float **mas)
             count += 1;
             printf("Сумма %d-ого четного столбца с индексом(%d)(считая от середины матрицы) во второй половине: %lf\n", count, j - half, summ);
         }
-        else {
-            break;
-        }
     }
 }
 
-void gauss(int m, int n, float **mas)
+void gauss(int m, int n, int N, float **mas)
 {
 
     float *temp;
     float temp2;
-    int i, j;
+    int i, j, l;
+    int count;
+    float a, b, c, k, summ;
+    float *x = (float *)malloc(N * sizeof(float));
 
     for (i = 0; i < m - 1; i++) // поднимает строку, первый элемент которой равен единице, на первую позицию, а нулю - на одну вниз
     {
@@ -364,41 +361,73 @@ void gauss(int m, int n, float **mas)
             }
         }
     }
-
-    float a, b, c; // основной метод гаууса
-    int count;
+    count = 0;
     for (i = 1; i < m; i++)
     {
         for (j = 0; j < i; j++)
         {
-            printf("\n c = %f\n", c);
-            for (count = 0; count < n - 1; count++)
+            if (*(*(mas + i - 1) + j) != 1 && *(*(mas + i - 1) + j) < 0)
             {
-
-                a = *(*(mas + 0) + count);
-                b = *(*(mas + i) + j);
-                c = b / a;
-
-                if (c == *(*(mas + i) + j))
+                k = *(*(mas + i - 1) + 0);
+                for (count = 0; count < n; count++)
                 {
-                    *(*(mas + i) + j) += -1 * c;
-                }
-                else if (c == -1 * *(*(mas + i) + j))
-                {
-                    *(*(mas + i) + j) += c;
-                }
-                else if (c == 1)
-                {
-                    *(*(mas + i) + j) += -1 * *(*(mas + i) + j);
-                }
-                else if (c == -1)
-                {
-                    *(*(mas + i) + j) += a;
-                }
-                else  {
-                    *(*(mas + i) + j) += -1 * a * c;
+                    *(*(mas + i - 1) + count) = *(*(mas + i - 1) + count) / k;
                 }
             }
         }
+    }
+
+    for (i = 1; i < m; i++)
+    {
+        for (j = 0; j < i; j++)
+        {
+            for (count = 0; count < n - 1; count++)
+            {
+                for (l = 0; l < n; l++)
+                {
+                    if (*(*(mas + i - 1) + j) == -1)
+                    {
+                        {
+                            *(*(mas + i - 1) + l) = -1 * *(*(mas + i - 1) + l);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (i = 1; i < m; i++)
+    {
+        for (j = 0; j < n - 1; j++)
+        {
+            if (i > j)
+            {
+                c = *(*(mas + i) + j) / *(*(mas + j) + j);
+                for (l = 0; l < n; l++)
+                {
+                    *(*(mas + i) + l) = *(*(mas + i) + l) - c * *(*(mas + j) + l);
+                }
+            }
+        }
+    }
+    printmatrix(m,n,mas);
+    *(x + N - 1) = *(*(mas + N - 1) + N) / *(*(mas + N - 1) + N - 1);
+    
+
+    for (i = m - 2; i >= 0; i--)
+    {
+        summ = 0;
+        for (j = i; j < N; j++)
+        {
+            summ += *(*(mas + i) + j) * *(x + j);
+        }
+        *(x + i) = (*(*(mas + i) + N ) - summ) / *(*(mas + i) + i);
+    }
+
+    printmatrix(m, n, mas);
+
+    for (i = 0; i < N; i++)
+    {
+        printf("x = %f\n\n", *(x + i));
     }
 }
